@@ -1,6 +1,6 @@
 HANDS = {
   PLAYER: "player1",
-  DEALER: "player2",
+  DEALER: "dealer",
   POOL: "pool",
   DISCARD: "discard"
 }
@@ -149,6 +149,22 @@ async function blackjack() {
 
 }
 
+// DOM FUNCTIONS
+// ------------------------------------------
+
+async function updateHand(deckId, hand) {
+  let tempHand = await getHand(deckId, hand)
+  let handElementId = "hand_" + hand
+  let handElement = $("#" + handElementId).empty()
+  handElement.append($("<h3>" + hand + "'s hand</h3>"))
+  for (let i = 0; i < tempHand.cards.length; i++) {
+    let cardElement = $("<img></img>").attr("id", hand + "_card_" + i)
+    cardElement.attr("src", tempHand.cards[i].image)
+    handElement.append(cardElement)
+  }
+  handElement.append($("<h3>Value: " + await getHandValueBlackjack(deckId, hand) + "</h3>"))
+}
+
 // MAIN
 // ------------------------------------------
 
@@ -156,6 +172,7 @@ async function main() {
   let deck1 = await createDeck()
   console.log("Session deckID: " + deck1)
   await drawBlackjackHand(deck1, HANDS.PLAYER)
+  await drawBlackjackHand(deck1, HANDS.DEALER)
   console.log(await getHandValueBlackjack(deck1, HANDS.PLAYER))
 
   while (!(await isHandBustedBlackjack(deck1, HANDS.PLAYER))) {
@@ -167,6 +184,9 @@ async function main() {
   let handValue = await getHandValueBlackjack(deck1, HANDS.PLAYER)
   console.log("Busted at " + handValue)
   console.log(await getHand(deck1, HANDS.PLAYER))
+
+  updateHand(deck1, HANDS.PLAYER)
+  updateHand(deck1, HANDS.DEALER)
 }
 
 main()
